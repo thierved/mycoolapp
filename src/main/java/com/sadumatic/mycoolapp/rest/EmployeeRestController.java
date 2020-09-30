@@ -1,12 +1,9 @@
 package com.sadumatic.mycoolapp.rest;
 
-import com.sadumatic.mycoolapp.dao.EmployeeDAO;
 import com.sadumatic.mycoolapp.entity.Employee;
 import com.sadumatic.mycoolapp.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,6 +12,7 @@ import java.util.List;
 public class EmployeeRestController {
     private EmployeeService employeeService;
 
+    @Autowired
     public EmployeeRestController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
@@ -22,5 +20,21 @@ public class EmployeeRestController {
     @GetMapping("/employees")
     public List<Employee> findAll() {
         return employeeService.findAll();
+    }
+
+    @GetMapping("/employees/{employeeId}")
+    public Employee getEmployee(@PathVariable int employeeId) {
+        Employee theEmployee = employeeService.findById(employeeId);
+        if (theEmployee == null) {
+            throw new RuntimeException("Employee id not found - " + employeeId);
+        }
+        return theEmployee;
+    }
+
+    @PostMapping("/employees")
+    public Employee addEmployee(@RequestBody Employee theEmployee) {
+        theEmployee.setId(0);
+        employeeService.save(theEmployee);
+        return theEmployee;
     }
 }
